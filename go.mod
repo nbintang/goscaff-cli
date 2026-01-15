@@ -1,4 +1,4 @@
-module github.com/nbintang/goscaff-cli
+module github.com/nbintang/goscaff
 
 go 1.24.0
 

@@ -1,4 +1,4 @@
-package goscaff
+package cmd
 
  
 
@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/nbintang/goscaff-cli/internal/scaffold"
-
+	"github.com/nbintang/goscaff/internal/scaffold"
 	"github.com/spf13/cobra"
 )
 

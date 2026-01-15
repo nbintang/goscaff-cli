@@ -1,8 +1,8 @@
 package main
 
-import "github.com/nbintang/goscaff-cli/cmd/goscaff"
+import "github.com/nbintang/goscaff/cmd"
 
 
 func main() {
-	goscaff.Execute()
+	cmd.Execute()
 }
