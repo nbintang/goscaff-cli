@@ -16,7 +16,20 @@ var rootCmd = &cobra.Command{
  ▀███▀  ▀███▀ ▄▄██▀ ▀████ ██▀██ ██    ██    
                                             
 Goscaff is an instant Go scaffolding CLI.
-Use it to generate a production-ready Go backend boilerplate.`,
+Use it to generate a production-ready Go backend boilerplate.
+
+Presets:
+  - base : minimal starter (core structure only)
+  - full : production-ready starter (default)
+
+Quick start:
+  goscaff new myapp --module github.com/you/myapp
+  goscaff new myapp --preset base
+  goscaff new myapp --preset full --db mysql --module github.com/you/myapp
+
+Tips:
+  - Run "goscaff new --help" to see all flags and examples.
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cmd.Help()
 	},
