@@ -23,6 +23,7 @@ Presets:
   - full : production-ready starter (default)
 
 Quick start:
+  goscaff new myapp
   goscaff new myapp --module github.com/you/myapp
   goscaff new myapp --preset base
   goscaff new myapp --preset full --db mysql --module github.com/you/myapp

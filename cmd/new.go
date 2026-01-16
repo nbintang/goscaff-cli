@@ -34,7 +34,11 @@ Database:
   postgres (default) or mysql
 `,
 	Args: cobra.ExactArgs(1),
-	Example: `  # Full preset (default) with module path
+	Example: `  
+  # Quick start
+  goscaff new myapp
+
+  # Full preset (default) with module path
   goscaff new myapp --module github.com/you/myapp
 
   # Base preset (minimal)
