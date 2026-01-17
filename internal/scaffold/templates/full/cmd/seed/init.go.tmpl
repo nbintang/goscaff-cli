@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"{{.MODULE_PATH}}/internal/enums" 
+	"{{.MODULE_PATH}}/internal/enums"
 	"{{.MODULE_PATH}}/internal/user"
 	"{{.MODULE_PATH}}/pkg/password"
 
@@ -21,7 +21,7 @@ type Options struct {
 
 func InitSeeds(db *gorm.DB, opt Options) error {
 	domain := strings.TrimPrefix("example.com", "@")
- 
+
 	if err := db.Exec("TRUNCATE TABLE users RESTART IDENTITY CASCADE").Error; err != nil {
 		return err
 	}
@@ -49,15 +49,16 @@ func InitSeeds(db *gorm.DB, opt Options) error {
 		}
 
 		if err := db.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "email"}},
+    		Columns: []clause.Column{
+                {Name: "email"},
+            },
 			DoNothing: true,
 		}).Create(&u).Error; err != nil {
 			return fmt.Errorf("create user failed (%s): %w", name, err)
 		}
 	}
-	
+
 	fmt.Println("Seeds initialized successfully")
 
 	return nil
 }
-

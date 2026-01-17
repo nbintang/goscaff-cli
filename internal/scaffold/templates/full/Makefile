@@ -16,12 +16,18 @@ AIR := air
 LOAD_ENV := set -a; [ -f $(ENV_FILE) ] && . $(ENV_FILE); set +a;
 endif
 
+docker:
+	docker compose up -d
+
 dev:
 	@echo "🚀 Running with Air..."
 	@$(LOAD_ENV) $(AIR)
 
 migrate:
 	@$(LOAD_ENV) go run ./cmd/migrate
+
+migrate-reset:
+	@$(LOAD_ENV) go run ./cmd/migrate --reset
 
 seed:
 	@$(LOAD_ENV) go run ./cmd/seed
