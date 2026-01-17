@@ -1,15 +1,13 @@
 package user
 
 import (
-	"{{.MODULE_PATH}}/internal/apperr"
-	"{{.MODULE_PATH}}/internal/identity"
+	"{{.MODULE_PATH}}/internal/apperr" 
 	"{{.MODULE_PATH}}/internal/infra/infraapp"
 	"{{.MODULE_PATH}}/internal/infra/validator"
 	"{{.MODULE_PATH}}/pkg/httpx"
 	"{{.MODULE_PATH}}/pkg/pagination"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
+	"github.com/gofiber/fiber/v2" 
 )
 
 type userHandlerImpl struct {
@@ -47,9 +45,7 @@ func (h *userHandlerImpl) GetAllUsers(c *fiber.Ctx) error {
 
 func (h *userHandlerImpl) GetUserByID(c *fiber.Ctx) error {
 	id := c.Params("id")
-	if _, err := uuid.Parse(id); err != nil {
-		return apperr.BadRequest(apperr.CodeBadRequest, "Invalid user ID", err)
-	}
+	 
 	ctx := c.UserContext()
 	data, err := h.userService.FindUserByID(ctx, id)
 	if err != nil {
@@ -57,40 +53,5 @@ func (h *userHandlerImpl) GetUserByID(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(httpx.NewHttpResponse(fiber.StatusOK, "Success", data))
 }
+ 
 
-func (h *userHandlerImpl) GetCurrentUserProfile(c *fiber.Ctx) error {
-	currentUser, err := identity.CurrentUser(c)
-	if err != nil {
-		return err
-	}
-	ctx := c.UserContext()
-	h.logger.Infof("user Id :%s", currentUser.ID)
-	data, err := h.userService.FindUserByID(ctx, currentUser.ID)
-	if err != nil {
-		return  err
-	}
-	return c.Status(fiber.StatusOK).JSON(httpx.NewHttpResponse(fiber.StatusOK, "Success", data))
-}
-
-func (h *userHandlerImpl) UpdateCurrentUser(c *fiber.Ctx) error {
-	currentUser, err := identity.CurrentUser(c)
-	if err != nil {
-		return err
-	}
-	var body UserUpdateDTO
-	if err := c.BodyParser(&body); err != nil {
-		return apperr.BadRequest(apperr.CodeBadRequest, "Invalid Request", err)
-	}
-
-	if err := h.validator.Struct(body); err != nil {
-		return apperr.BadRequest(apperr.CodeBadRequest, "Validation Error", err)
-	}
-
-	if err := h.userService.UpdateProfile(c.UserContext(), currentUser.ID, body); err != nil {
-		return err
-	}
-
-	return c.Status(fiber.StatusOK).JSON(
-		httpx.NewHttpResponse[any](fiber.StatusOK, "User Updated Successfully", nil),
-	)
-}

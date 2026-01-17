@@ -20,82 +20,44 @@ type Options struct {
 }
 
 func InitSeeds(db *gorm.DB, opt Options) error {
-	domain := "example.com"
-
-	if err := resetTables(db); err != nil {
+	domain := strings.TrimPrefix("example.com", "@")
+ 
+	if err := db.Exec("TRUNCATE TABLE users RESTART IDENTITY CASCADE").Error; err != nil {
 		return err
 	}
+
 	hashed, err := password.Hash("Password123")
 	if err != nil {
 		return err
 	}
+
 	for i := 0; i < opt.Count; i++ {
 		name := faker.Name()
 
-		userSeed := user.User{
+		role := user.Role(enums.Admin)
+		if i%2 == 0 {
+			role = user.Role(enums.Member)
+		}
+
+		u := user.User{
 			Name:            name,
-			Email:           realisticEmail(name, i, domain),
-			AvatarURL:       realisticAvatar(name),
+			Email:           fmt.Sprintf("%s.%d@%s", slug.Make(name), i+1, domain),
+			AvatarURL:       fmt.Sprintf("https://ui-avatars.com/api/?name=%s&background=random", strings.ReplaceAll(name, " ", "+")),
 			Password:        hashed,
-			Role:            evenOddRole(i),
+			Role:            role,
 			IsEmailVerified: rand.Intn(2) == 1,
 		}
 
-        if err := db.Clauses(clause.OnConflict{
-       	Columns: []clause.Column{
-      		{
-     			Name: "email",
-      		},
-       	},
-       	DoNothing: true,
-        }).Create(&userSeed).Error; err != nil {
-       	fmt.Printf("Error when create user: %s\n", userSeed.Name)
-       	return err
-        }
+		if err := db.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "email"}},
+			DoNothing: true,
+		}).Create(&u).Error; err != nil {
+			return fmt.Errorf("create user failed (%s): %w", name, err)
+		}
 	}
+	
+	fmt.Println("Seeds initialized successfully")
+
 	return nil
 }
 
-func evenOddRole(i int) user.Role {
-	if i%2 == 0 {
-		return user.Role(enums.Member)
-	}
-	return user.Role(enums.Admin)
-}
-
-
-func realisticEmail(fullName string, i int, domain string) string {
-	// domain tanpa "@"
-	domain = strings.TrimPrefix(domain, "@")
-	user := slug.Make(fullName)
-	return fmt.Sprintf("%s.%d@%s", user, i+1, domain)
-}
-
-func realisticAvatar(fullName string) string {
-	// gampang & rapi, avatar dari initials
-	// contoh: https://ui-avatars.com/api/?name=John+Doe&background=random
-	name := strings.ReplaceAll(fullName, " ", "+")
-	return fmt.Sprintf("https://ui-avatars.com/api/?name=%s&background=random", name)
-}
-
-
-func realisticPostBody() string {
-	// faker.Paragraph() biasanya lebih enak dari Sentence()
-	// kalau faker versi kamu tidak punya Paragraph, ganti jadi faker.Sentence() beberapa kali
-	return faker.Paragraph()
-}
-
-func resetTables(db *gorm.DB) error {
-	return db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Exec("TRUNCATE TABLE posts RESTART IDENTITY CASCADE").Error; err != nil {
-			return err
-		}
-		if err := tx.Exec("TRUNCATE TABLE categories RESTART IDENTITY CASCADE").Error; err != nil {
-			return err
-		}
-		if err := tx.Exec("TRUNCATE TABLE users RESTART IDENTITY CASCADE").Error; err != nil {
-			return err
-		}
-		return nil
-	})
-}

@@ -2,14 +2,27 @@ package main
 
 import (
 	"context"
+	"flag"
 	"{{.MODULE_PATH}}/config"
 	"{{.MODULE_PATH}}/internal/infra/database"
 	"{{.MODULE_PATH}}/internal/user"
 
-	"gorm.io/gorm"
+	"github.com/sirupsen/logrus"
 )
 
+var ROLE = []string{
+	"ADMIN",
+	"USER",
+}
+
+var CreateRoleEnum = CreateEnums(EnumOptions{
+	Name:   "role_type",
+	Values: ROLE,
+})
+
 func InitMigrate(ctx context.Context) error {
+	reset := flag.Bool("reset", false, "Drop all tables then migrate")
+	flag.Parse()
 	dbLogger := database.NewLogger()
 	env, err := config.NewEnvs()
 	if err != nil {
@@ -20,35 +33,21 @@ func InitMigrate(ctx context.Context) error {
 		return err
 	}
 
-	if err := createEnums(ctx, db); err != nil {
+	if err := CreateRoleEnum(ctx, db); err != nil {
 		return err
 	}
-
+	if err != nil {
+		return err
+	}
+	if *reset {
+		logrus.Println("Resetting database (dropping all tables)...")
+		if err := database.Reset(db); err != nil {
+			logrus.Fatal(err)
+		}
+	}
 	return db.WithContext(ctx).Debug().AutoMigrate(
 		&user.User{},
 		// add more models / entities in here
+		//
 	)
-}
-
-func createEnums(ctx context.Context, db *gorm.DB) error {
-	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Debug().Exec(`
-		DO $$ BEGIN
-			CREATE TYPE role_type AS ENUM ('ADMIN', 'MEMBER');
-		EXCEPTION
-			WHEN duplicate_object THEN null;
-		END $$;`).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Debug().Exec(`
-		DO $$ BEGIN
-			CREATE TYPE status_type AS ENUM ('PUBLISHED', 'DRAFT');
-		EXCEPTION
-			WHEN duplicate_object THEN null;
-		END $$;`).Error; err != nil {
-			return err
-		}
-		return nil
-	})
 }

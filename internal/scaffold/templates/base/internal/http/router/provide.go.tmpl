@@ -12,7 +12,7 @@ type ProvideRouteOptions[P HasRouteParamsInjected, R any] struct {
 func ProvideRoute[P HasRouteParamsInjected, R any](opts ProvideRouteOptions[P, R]) any {
 	acc := opts.Acc
 	if acc == "" {
-		acc = RoutePublic
+		acc = RouteAccess
 	}
 	return fx.Annotate(
 		opts.Constructor,

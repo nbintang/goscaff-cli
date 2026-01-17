@@ -12,10 +12,12 @@ var Module = fx.Module(
 		NewUserRepository,
 		NewUserService,
 		NewUserHandler,
-		router.ProvideRoute[UserRouteParams, router.ProtectedRoute](
-			router.ProvideRouteOptions[UserRouteParams, router.ProtectedRoute]{
+		// This is the route you provide and register
+		// Please use router.ProvideRoute instead
+		router.ProvideRoute[UserRouteParams, router.Route](
+			router.ProvideRouteOptions[UserRouteParams, router.Route]{
 				Constructor: NewUserRoute,
-				Acc:         router.RouteProtected,
+				Acc:         router.RouteAccess,
 			},
 		),
 	),

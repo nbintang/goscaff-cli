@@ -29,8 +29,10 @@ func printNextSteps(outDir string, opts Options) {
 
 	// Step 2
 	printStep("Setup environment",
-		"cp .env.example .env",
+		"cp .env.example .env.local",
 	)
+
+	cNote.Println("    Make sure to set environment variables configuration correctly before running migrations.")
 
 	// Full preset extras
 	if opts.Preset == "full" {
@@ -40,13 +42,19 @@ func printNextSteps(outDir string, opts Options) {
 	}
 
 	// Run
-	printStep("Run the app",
+	printStep("Run the Migration",
+		"go run ./cmd/migrate",
+	)
+	printStep("Run the Seed",
+		"go run ./cmd/seed",
+	)
+	printStep("Run the App",
 		"go run ./cmd/api",
 	)
 
 	fmt.Println()
 	cNote.Println("  • Server: http://localhost:8080")
-	cNote.Println("  • If you changed ports, check .env")
+	cNote.Println("  • If you changed ports, check .env.local")
 	fmt.Println()
 }
 

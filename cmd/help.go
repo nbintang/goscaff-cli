@@ -3,9 +3,9 @@ package cmd
 import "github.com/spf13/cobra"
 
 const (
-	clrReset  = "\x1b[0m"
-	clrBold   = "\x1b[1m"
-	clrDim    = "\x1b[2m"
+	clrReset = "\x1b[0m"
+	clrBold  = "\x1b[1m"
+	clrDim   = "\x1b[2m"
 
 	clrCyan   = "\x1b[36m"
 	clrGreen  = "\x1b[32m"
