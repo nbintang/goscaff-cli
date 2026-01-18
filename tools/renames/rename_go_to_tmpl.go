@@ -13,6 +13,12 @@ import (
 // It skips:
 //   - already *.go.tmpl
 //   - non-.go files
+//
+// go run . ./internal/scaffold/templates
+//
+//
+//
+
 func RenameAllGoToTmpl(templateDir string, dryRun bool) error {
 	templateDir = filepath.Clean(templateDir)
 
@@ -59,8 +65,6 @@ func RenameAllGoToTmpl(templateDir string, dryRun bool) error {
 }
 
 func main() {
-	// contoh pemakaian:
-	// - ganti path ini ke folder templates kamu
 	dir := "./internal/scaffold/templates"
 
 	// 1) preview dulu

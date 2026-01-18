@@ -10,25 +10,39 @@ import (
 //go:embed all:templates/**
 var templateFS embed.FS
 
-type Options struct {
+type Scaffold interface {
+	Generate() error
+}
+
+type ScaffoldOptions struct {
 	ProjectName string
 	ModulePath  string
 	DB          string
-	Preset      string // "base" | "full"
+	Preset      string
+	OutDir      string
 }
 
-func info(format string, args ...any) {
-	fmt.Printf("• "+format+"\n", args...)
+type scaffoldImpl struct {
+	templateFS embed.FS
+	opts       ScaffoldOptions
 }
 
-func Generate(outDir string, opts Options) error {
+func NewScaffold(opts ScaffoldOptions) Scaffold {
+	return &scaffoldImpl{
+		templateFS: templateFS,
+		opts:       opts,
+	}
+}
+
+
+func (s *scaffoldImpl) Generate() error {
 	presetRoot := "templates/base"
-	if opts.Preset == "full" {
+	if s.opts.Preset == "full" {
 		presetRoot = "templates/full"
 	}
 
 	dbRoot := "templates/db/postgres"
-	if opts.DB == "mysql" {
+	if s.opts.DB == "mysql" {
 		dbRoot = "templates/db/mysql"
 	}
 
@@ -36,41 +50,40 @@ func Generate(outDir string, opts Options) error {
 
 	fmt.Println()
 	header("Goscaff • Project Generator")
-	infoLine("Folder : " + outDir)
-	infoLine("Preset : " + opts.Preset)
-	infoLine("DB     : " + opts.DB)
+	info("Folder : " + s.opts.OutDir)
+	info("Preset : " + s.opts.Preset)
+	info("DB     : " + s.opts.DB)
 	fmt.Println()
 
 	action("Creating project directory")
-	if err := os.MkdirAll(outDir, 0o755); err != nil {
+	if err := os.MkdirAll(s.opts.OutDir, 0o755); err != nil {
 		return err
 	}
-	ok("Directory created")
+	success("Directory created")
 
-	action("Rendering preset (" + opts.Preset + ")")
-	if err := renderDir(presetRoot, outDir, opts); err != nil {
+	action("Rendering preset (" + s.opts.Preset + ")")
+	if err := renderDir(presetRoot, s.opts.OutDir, s.opts); err != nil {
 		return err
 	}
-	ok("Preset rendered")
+	success("Preset rendered")
 
 	// kalau kamu masih mau overlay selalu jalan, ya biarin.
 	// Tapi kalau mau base bersih, taruh if opts.Preset == "full"
-	action("Rendering database driver (" + opts.DB + ")")
-	if err := renderDirTo(dbRoot, outDir, dstBase, opts); err != nil {
+	action("Rendering database driver (" + s.opts.DB + ")")
+	if err := renderDirTo(dbRoot, s.opts.OutDir, dstBase, s.opts); err != nil {
 		return err
 	}
-	ok("Database applied")
+	success("Database applied")
 
 	action("Running: go mod tidy")
-	if err := runVerbose(outDir, "go", "mod", "tidy"); err != nil {
+	if err := runVerbose(s.opts.OutDir, "go", "mod", "tidy"); err != nil {
 		return err
 	}
-	ok("Dependencies installed")
+	success("Dependencies installed")
 
 	action("Initializing git repository")
-	_ = runQuiet(outDir, "git", "init")
-	ok("Git initialized")
-
-	printNextSteps(outDir, opts)
+	_ = runQuiet(s.opts.OutDir, "git", "init")
+	success("Git initialized")
+	
 	return nil
 }

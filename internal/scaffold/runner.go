@@ -16,7 +16,6 @@ func runVerbose(dir string, name string, args ...string) error {
 func runQuiet(dir string, name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Dir = dir
-	// discard output biar bersih
 	cmd.Stdout = nil
 	cmd.Stderr = nil
 	return cmd.Run()

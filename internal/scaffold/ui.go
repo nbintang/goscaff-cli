@@ -9,16 +9,16 @@ var (
 	// Status
 	cOk     = color.New(color.FgGreen, color.Bold)
 	cTip    = color.New(color.FgYellow)
-	cInfo   = color.New(color.FgHiBlack)  
+	cInfo   = color.New(color.FgHiBlack)
 	cAction = color.New(color.FgWhite, color.Bold)
 
 	// Sections
 	cStepTitle = color.New(color.FgWhite, color.Bold)
-	cBullet    = color.New(color.FgHiBlack)  
+	cBullet    = color.New(color.FgHiBlack)
 
 	// Commands & notes
-	cCmd  = color.New(color.FgHiBlue)   
-	cNote = color.New(color.FgHiBlack) 
+	cCmd  = color.New(color.FgHiBlue)
+	cNote = color.New(color.FgHiBlack)
 
 	cSep = color.New(color.FgHiBlack)
 )
@@ -29,18 +29,17 @@ func header(title string) {
 }
 
 func action(label string) {
-	// contoh: "Render preset (base)"
 	cInfo.Print("  ")
 	cAction.Println(label)
 }
 
-func ok(msg string) {
+func success(msg string) {
 	cInfo.Print("  ")
 	cOk.Print("✓ ")
 	cOk.Println(msg)
 }
 
-func infoLine(msg string) {
+func info(msg string) {
 	cInfo.Print("  ")
 	cInfo.Println(msg)
 }

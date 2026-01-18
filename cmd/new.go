@@ -70,14 +70,14 @@ Database:
 			return fmt.Errorf("invalid --db=%s (use postgres|mysql)", flagDB)
 		}
 
-		opts := scaffold.Options{
+		scaffold := scaffold.NewScaffold(scaffold.ScaffoldOptions{
 			ProjectName: projectName,
 			ModulePath:  modulePath,
 			DB:          flagDB,
 			Preset:      flagPreset,
-		}
-
-		return scaffold.Generate(outDir, opts)
+			OutDir:      outDir,
+		})
+		return scaffold.Generate()
 	},
 }
 
@@ -87,8 +87,4 @@ func init() {
 	newCmd.Flags().StringVar(&flagModule, "module", "", "Go module path (default: project-name)")
 	newCmd.Flags().StringVar(&flagPreset, "preset", "base", "Template preset: base|full")
 	newCmd.Flags().StringVar(&flagDB, "db", "postgres", "Database driver: postgres|mysql")
-
-	// bikin output help lebih rapi
-	// _ = newCmd.MarkFlagRequired("module") // kalau memang kamu ingin wajib
-	// Kalau kamu tidak mau wajib, hapus baris di atas.
 }

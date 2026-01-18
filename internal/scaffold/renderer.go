@@ -9,7 +9,7 @@ import (
 	"text/template"
 )
 
-func renderDirTo(srcRoot, outRoot, dstBase string, opts Options) error {
+func renderDirTo(srcRoot, outRoot, dstBase string, opts ScaffoldOptions) error {
 	entries, err := templateFS.ReadDir(srcRoot)
 	if err != nil {
 		return err
@@ -17,13 +17,13 @@ func renderDirTo(srcRoot, outRoot, dstBase string, opts Options) error {
 
 	for _, e := range entries {
 		srcPath := filepath.ToSlash(filepath.Join(srcRoot, e.Name()))
- 
+
 		outPath := filepath.Join(outRoot, dstBase, e.Name())
 
 		if e.IsDir() {
 			if err := os.MkdirAll(outPath, 0o755); err != nil {
 				return err
-			} 
+			}
 			if err := renderDirTo(srcPath, outRoot, filepath.Join(dstBase, e.Name()), opts); err != nil {
 				return err
 			}
@@ -77,6 +77,6 @@ func renderDirTo(srcRoot, outRoot, dstBase string, opts Options) error {
 	return nil
 }
 
-func renderDir(srcRoot, outRoot string, opts Options) error {
+func renderDir(srcRoot, outRoot string, opts ScaffoldOptions) error {
 	return renderDirTo(srcRoot, outRoot, "", opts)
 }
